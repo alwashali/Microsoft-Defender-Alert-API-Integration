@@ -1,0 +1,9 @@
+filepath        : C:\temp\logs\
+tenantId        : 
+appId           : 
+appSecret       : 
+resourceAppIdUri: https://api.securitycenter.windows.com
+timerange       : -1h
+
+
+
