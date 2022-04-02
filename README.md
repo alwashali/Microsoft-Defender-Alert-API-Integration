@@ -1,7 +1,7 @@
 # Microsoft-Defender-Alert-API-Integration
 Microsoft Defender Alert API Integration
 
-All alerts will be pulled based on the time framed specified in config.yaml and converted into one alert per line.
+All alerts will be pulled based on the time framed specified in config.yaml and written into a file, one alert per line for easier parsing in SIEM.
 
 ### Integrating Micrsofot Defender with SIEM
 - Compile the code using go build command 
