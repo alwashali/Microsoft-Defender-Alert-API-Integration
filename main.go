@@ -17,6 +17,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/tidwall/gjson"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type config struct {
@@ -65,22 +66,20 @@ func configVerify(c config) error {
 	return nil
 }
 
-func GetFilenameDate() string {
-
-	t := time.Now()
-	return "alerts-" + t.Format("2_January_2006") + ".txt"
-
-}
-
 func writeToFile(alerts string) {
 
 	if alerts != "[]" {
-		filename := GetFilenameDate()
-		p := filepath.Join(appConfig.Filepath, filename)
+		filename := "Alerts.txt"
+		log.SetOutput(&lumberjack.Logger{
+			Filename:   filepath.Join(appConfig.Filepath, filename),
+			MaxSize:    10, // megabytes
+			MaxBackups: 3,
+			MaxAge:     90,    //days
+			Compress:   false, // disabled by default
+		})
 
-		file, err := os.OpenFile(p, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-		handleError(err)
-		defer file.Close()
+		//removing timestamp since it's already logged
+		log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 
 		alertsResult := gjson.Get(alerts, "value")
 		alertstoWrite := ""
@@ -90,8 +89,8 @@ func writeToFile(alerts string) {
 			alertsCount = alertsCount + 1
 			alertstoWrite += value.String() + "\n"
 		}
-		_, err = file.WriteString(alertstoWrite)
-		handleError(err)
+		log.Print(alertstoWrite)
+
 		logging("Successful execution, found " + strconv.Itoa(alertsCount) + " new alerts")
 
 	} else {
